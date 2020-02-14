@@ -50,22 +50,9 @@ drawPixel:
 ; draw a horizontal line
 drawLine_h:
 	color EQU ss:[bp+4]
-	; Parameters for horizontal line
-	hx1 EQU ss:[bp+6]
-	hy1 EQU ss:[bp+8]
-	hx2 EQU ss:[bp+10]
-	; Parameters for vertical line
-	vx1 EQU ss:[bp+12]
-	vy1 EQU ss:[bp+14]
-	vy2 EQU ss:[bp+16]
-	; Parameters for increasing diagonal line
-	dx1 EQU ss:[bp+18]
-	dy1 EQU ss:[bp+20]
-	dx2 EQU ss:[bp+22]
-	; Parameters for decreasing diagonal line
-	ex1 EQU ss:[bp+24]
-	ey1 EQU ss:[bp+26]
-	ex2 EQU ss:[bp+28]
+	x1 EQU ss:[bp+6]
+	y1 EQU ss:[bp+8]
+	X2 EQU ss:[bp+10]
 
 	push bp
 	mov bp, sp
@@ -74,14 +61,14 @@ drawLine_h:
 	push    cx
 
 	; BX keeps track of the X coordinate
-	mov	bx, hx1
+	mov	bx, x1
 
 	; CX = number of pixels to draw
-	mov	cx, hx2
+	mov	cx, x2
 	sub	cx, bx
 	inc	cx
 	dlh_loop:
-		push	hy1
+		push	y1
 		push	bx
 		push	color
 		call	drawPixel
@@ -92,34 +79,34 @@ drawLine_h:
 	pop     cx
 	pop     bx
 
-	; pop bp
+	pop bp
 
-	; ret 8
+	ret 8
 
 
 ; draw a vertical line
 drawLine_v:
-	; color EQU ss:[bp+4]
-	; x1 EQU ss:[bp+6]
-	; y1 EQU ss:[bp+8]
-	; y2 EQU ss:[bp+10]
+	color EQU ss:[bp+4]
+	x1 EQU ss:[bp+6]
+	y1 EQU ss:[bp+8]
+	y2 EQU ss:[bp+10]
 
-	; push bp
-	; mov bp, sp
+	push bp
+	mov bp, sp
 
 	push    bx
 	push    cx
 
 	; BX keeps track of the Y coordinate
-	mov	bx, vy1
+	mov	bx, y1
 
 	; CX = number of pixels to draw
-	mov	cx, vy2
+	mov	cx, y2
 	sub	cx, bx
 	inc	cx
 	dlv_loop:
 		push	bx
-		push	vx1
+		push	x1
 		push	color
 		call	drawPixel
 		add	bx, 1
@@ -129,32 +116,20 @@ drawLine_v:
 	pop     cx
 	pop     bx
 
-	; pop bp
+	pop bp
 
-	; ret 8
+	ret 8
 
-ORD PTR 160
-	push WORD PTR 110
-	push WORD PTR 60
 
-	; v parameters
+; draw a right increasing diagonal line
+drawLine_d1:
+	color EQU ss:[bp+4]
+	x1 EQU ss:[bp+6]
+	y1 EQU ss:[bp+8]
+	x2 EQU ss:[bp+10]
 
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 260
-
-	; h parameters
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0001h
-	; color EQU ss:[bp+4]
-	; x1 EQU ss:[bp+6]
-	; y1 EQU ss:[bp+8]
-	; x2 EQU ss:[bp+10]
-
-	; push bp
-	; mov bp, sp
+	push bp
+	mov bp, sp
 
 	push    bx
 	push    cx
@@ -162,11 +137,11 @@ ORD PTR 160
 
 	; BX keeps track of the X coordinate,
 	; DX keeps track of the Y coordinate
-	mov	bx, dx1
-	mov	dx, dy1
+	mov	bx, x1
+	mov	dx, y1
 
 	; CX = number of pixels to draw
-	mov	cx, dx2
+	mov	cx, x2
 	sub	cx, bx
 	inc	cx
 	dld1_loop:
@@ -183,20 +158,20 @@ ORD PTR 160
 	pop     cx
 	pop     bx
 
-	; pop bp
+	pop bp
 
-	; ret 8
+	ret 8
 
 
 ; draw a right decreasing diagonal line
 drawLine_d2:
-	; color EQU ss:[bp+4]
-	; x1 EQU ss:[bp+6]
-	; y1 EQU ss:[bp+8]
-	; x2 EQU ss:[bp+10]
+	color EQU ss:[bp+4]
+	x1 EQU ss:[bp+6]
+	y1 EQU ss:[bp+8]
+	x2 EQU ss:[bp+10]
 
-	; push bp
-	; mov bp, sp
+	push bp
+	mov bp, sp
 
 	push    bx
 	push    cx
@@ -208,7 +183,7 @@ drawLine_d2:
 	mov	dx, y1
 
 	; CX = number of pixels to draw
-	mov	cx, ex2
+	mov	cx, x2
 	sub	cx, bx
 	inc	cx
 	dld2_loop:
@@ -243,24 +218,6 @@ start:
 	; draw a house
 
 	; left wall
-
-	; d2 parameters
-	push WORD PTR 260
-	push WORD PTR 10
-	push WORD PTR 160
-	
-	;d1 parameters
-	push WORD PTR 160
-	push WORD PTR 110
-	push WORD PTR 60
-
-	; v parameters
-
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 260
-
-	; h parameters
 	push WORD PTR 190
 	push WORD PTR 110
 	push WORD PTR 60
@@ -268,39 +225,39 @@ start:
 	call drawLine_h
 
 	; right wall
-	; push WORD PTR 190
-	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
-	; call drawLine_v
+	push WORD PTR 190
+	push WORD PTR 110
+	push WORD PTR 260
+	push 0002h
+	call drawLine_v
 
-	; ; top
-	; push WORD PTR 260
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push 0003h
-	; call drawLine_h
+	; top
+	push WORD PTR 260
+	push WORD PTR 110
+	push WORD PTR 60
+	push 0003h
+	call drawLine_h
 
-	; ; floor
-	; push WORD PTR 260
-	; push WORD PTR 190
-	; push WORD PTR 60
-	; push 0004h
-	; call drawLine_h
+	; floor
+	push WORD PTR 260
+	push WORD PTR 190
+	push WORD PTR 60
+	push 0004h
+	call drawLine_h
 			
 	; roof left
-	; push WORD PTR 160
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push 0005h
-	; call drawLine_d1
+	push WORD PTR 160
+	push WORD PTR 110
+	push WORD PTR 60
+	push 0005h
+	call drawLine_d1
 
 	; roof right
-	; push WORD PTR 260
-	; push WORD PTR 10
-	; push WORD PTR 160
-	; push 0006h
-	; call drawLine_d2
+	push WORD PTR 260
+	push WORD PTR 10
+	push WORD PTR 160
+	push 0006h
+	call drawLine_d2
 
 	; prompt for a key
 	mov ah, 0
