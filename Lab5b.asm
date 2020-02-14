@@ -57,7 +57,7 @@ drawLine_h:
 	; Parameters for vertical line
 	vx1 EQU ss:[bp+12]
 	vy1 EQU ss:[bp+14]
-	vx2 EQU ss:[bp+16]
+	vy2 EQU ss:[bp+16]
 	; Parameters for increasing diagonal line
 	dx1 EQU ss:[bp+18]
 	dy1 EQU ss:[bp+20]
@@ -196,7 +196,7 @@ drawLine_d2:
 	mov	dx, y1
 
 	; CX = number of pixels to draw
-	mov	cx, x2
+	mov	cx, ex2
 	sub	cx, bx
 	inc	cx
 	dld2_loop:
@@ -231,6 +231,24 @@ start:
 	; draw a house
 
 	; left wall
+
+	; d2 parameters
+	push WORD PTR 260
+	push WORD PTR 10
+	push WORD PTR 160
+	
+	;d1 parameters
+	push WORD PTR 160
+	push WORD PTR 110
+	push WORD PTR 60
+
+	; v parameters
+
+	push WORD PTR 190
+	push WORD PTR 110
+	push WORD PTR 260
+
+	; h parameters
 	push WORD PTR 190
 	push WORD PTR 110
 	push WORD PTR 60
@@ -238,39 +256,39 @@ start:
 	call drawLine_v
 
 	; right wall
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 260
-	push 0002h
-	call drawLine_v
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 260
+	; push 0002h
+	; call drawLine_v
 
-	; top
-	push WORD PTR 260
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0003h
-	call drawLine_h
+	; ; top
+	; push WORD PTR 260
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0003h
+	; call drawLine_h
 
-	; floor
-	push WORD PTR 260
-	push WORD PTR 190
-	push WORD PTR 60
-	push 0004h
-	call drawLine_h
+	; ; floor
+	; push WORD PTR 260
+	; push WORD PTR 190
+	; push WORD PTR 60
+	; push 0004h
+	; call drawLine_h
 			
 	; roof left
-	push WORD PTR 160
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0005h
-	call drawLine_d1
+	; push WORD PTR 160
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0005h
+	; call drawLine_d1
 
 	; roof right
-	push WORD PTR 260
-	push WORD PTR 10
-	push WORD PTR 160
-	push 0006h
-	call drawLine_d2
+	; push WORD PTR 260
+	; push WORD PTR 10
+	; push WORD PTR 160
+	; push 0006h
+	; call drawLine_d2
 
 	; prompt for a key
 	mov ah, 0
