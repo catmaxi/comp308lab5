@@ -84,8 +84,8 @@ drawLine_h:
 		push	bx
 		push	color
 		call	drawPixel
-		dec bx
-        dec ax
+		inc bx
+        inc ax
 		dec dx
         dec cx
         jnz dlh_loop
@@ -250,10 +250,10 @@ start:
 	; call drawLine_v
 
 	; top
-	push WORD PTR 300
-	push WORD PTR 300
-	push WORD PTR 260
-    push WORD PTR 110
+	push WORD PTR 50
+	push WORD PTR 50
+	push WORD PTR 350
+    push WORD PTR 450
 	push 0003h
 	call drawLine_h
 
