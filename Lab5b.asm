@@ -50,10 +50,10 @@ drawPixel:
 ; draw a horizontal line
 drawLine_h:
 	color EQU ss:[bp+4]
-	x1 EQU ss:[bp+6]
-	y1 EQU ss:[bp+8]
-	x2 EQU ss:[bp+10]
-	y2 EQU ss:[bp+12]
+	y2 EQU ss:[bp+6]
+	x2 EQU ss:[bp+8]
+	y1 EQU ss:[bp+10]
+	x1 EQU ss:[bp+12]
 
 	push bp
 	mov bp, sp
@@ -84,8 +84,8 @@ drawLine_h:
 		push	bx
 		push	color
 		call	drawPixel
-		inc bx
-        inc ax
+		dec bx
+        dec ax
 		dec dx
         dec cx
         jnz dlh_loop
@@ -168,7 +168,7 @@ drawLine_h:
 ; 		push	color
 ; 		call	drawPixel
 ; 		add	bx, 1
-; 		sub	dx, 1
+; 		sub dx, 1
 ; 		loopw	dld1_loop
 ; 	dld1_end:
 
@@ -223,7 +223,6 @@ drawLine_h:
 
 ; 	ret 8
 
-
 start:
 	; initialize data segment
 	mov ax, @data
@@ -251,10 +250,10 @@ start:
 	; call drawLine_v
 
 	; top
-	push WORD PTR 260
-	push WORD PTR 110
 	push WORD PTR 300
-    push WORD PTR 300
+	push WORD PTR 300
+	push WORD PTR 260
+    push WORD PTR 110
 	push 0003h
 	call drawLine_h
 
@@ -265,7 +264,7 @@ start:
 	; push 0004h
 	; call drawLine_h
 			
-	; ; roof left
+	; roof left
 	; push WORD PTR 160
 	; push WORD PTR 110
 	; push WORD PTR 60
