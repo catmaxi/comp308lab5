@@ -5,6 +5,7 @@
 .code
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
+; test
 drawPixel:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
