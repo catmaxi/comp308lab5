@@ -238,21 +238,21 @@ start:
 	push WORD PTR 160
 	
 	;d1 parameters
-	push WORD PTR 160
-	push WORD PTR 110
-	push WORD PTR 60
+	; push WORD PTR 160
+	; push WORD PTR 110
+	; push WORD PTR 60
 
-	; v parameters
+	; ; v parameters
 
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 260
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 260
 
-	; h parameters
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0001h
+	; ; h parameters
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0001h
 	call drawLine_v
 
 	; right wall
