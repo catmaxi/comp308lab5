@@ -205,6 +205,66 @@ drawLine_d2:
 	ret 8
 
 
+	; Draline line general
+	drawLine:
+	color EQU ss:[bp+4]
+	x1 EQU ss:[bp+6]
+	y1 EQU ss:[bp+8]
+	X2 EQU ss:[bp+10]
+	y2 EQU ss:[bp+12]
+
+	push bp
+	mov bp, sp
+
+	push    bx
+	push    cx
+
+
+	check_deltaX:
+	; BX keeps track of the X coordinate
+	; mov	bx, x1
+	mov dx, x2
+
+	; delta x
+	sub dx, x1
+
+	; if 0
+	jz check_deltaY
+
+	push dx
+
+	check_deltaY:
+
+	mov bx, y2
+	sub bx, y1
+
+
+	push bx
+
+
+
+
+	; CX = number of pixels to draw
+	mov	cx, x2
+	sub	cx, bx
+	inc	cx
+	dl_loop:
+		push	y1
+		push	bx
+		push	color
+		call	drawPixel
+		add	bx, 1
+		loopw	dl_loop
+	dl_end:
+
+	pop     cx
+	pop     bx
+
+	pop bp
+
+	ret 10
+
+
 start:
 	; initialize data segment
 	mov ax, @data
@@ -218,46 +278,86 @@ start:
 	; draw a house
 
 	; left wall
-	push WORD PTR 190
+	push WORD PTR 260
 	push WORD PTR 110
+	push WORD PTR 60
 	push WORD PTR 60
 	push 0001h
-	call drawLine_h
+	call drawLine
 
-	; right wall
-	push WORD PTR 190
-	push WORD PTR 110
-	push WORD PTR 260
-	push 0002h
-	call drawLine_v
+	; ; left wall
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0001h
+	; call drawLine_v
 
-	; top
-	push WORD PTR 260
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0003h
-	call drawLine_h
+	; ; right wall
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 260
+	; push 0002h
+	; call drawLine_v
 
-	; floor
-	push WORD PTR 260
-	push WORD PTR 190
-	push WORD PTR 60
-	push 0004h
-	call drawLine_h
+	; ; top
+	; push WORD PTR 260
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0003h
+	; call drawLine_h
+
+	; ; floor
+	; push WORD PTR 260; left wall
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0001h
+	; call drawLine_v
+
+	; ; right wall
+	; push WORD PTR 190
+	; push WORD PTR 110
+	; push WORD PTR 260
+	; push 0002h
+	; call drawLine_v
+
+	; ; top
+	; push WORD PTR 260
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0003h
+	; call drawLine_h
+
+	; ; floor
+	; push WORD PTR 260
+	; push WORD PTR 190
+	; push WORD PTR 60
+	; push 0004h
+	; call drawLine_h
 			
-	; roof left
-	push WORD PTR 160
-	push WORD PTR 110
-	push WORD PTR 60
-	push 0005h
-	call drawLine_d1
+	; ; roof left
+	; push WORD PTR 160
+	; push WORD PTR 110
+	; push WORD PTR 60
+	; push 0005h
+	; call drawLine_d1
 
-	; roof right
-	push WORD PTR 260
-	push WORD PTR 10
-	push WORD PTR 160
-	push 0006h
-	call drawLine_d2
+	; ; roof right
+	; push WORD PTR 260
+	; push WORD PTR 10
+	; push WORD PTR 160
+	; push 0006h
+	; call drawLine_d2
+	; push WORD PTR 60
+	; push 0005h
+	; call drawLine_d1
+
+	; ; roof right
+	; push WORD PTR 260
+	; push WORD PTR 10
+	; push WORD PTR 160
+	; push 0006h
+	; call drawLine_d2
 
 	; prompt for a key
 	mov ah, 0
