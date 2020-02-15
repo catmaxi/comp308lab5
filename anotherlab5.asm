@@ -372,6 +372,8 @@ drawLine_d2:
 	
 	; loop function
 	loopfun:
+
+	loop_begin:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
 	y1 EQU ss:[bp+8]
@@ -380,55 +382,43 @@ drawLine_d2:
 	deltaX EQU ss:[bp+14]
 	deltaY EQU ss:[bp+16]
 	total EQU ss:[bp+18]
+	
 	push bp
 	mov bp, sp
 
 	mov cx, total
 
-	loop_begin:
-	
-	mov cx, 0
-	
-
-	; mov dx, 100
-	; sub dx, cx
-	; push ax
-	; mov ax, dx
-	; mov bx, 1
-	; mul bx
-	; mov dx, ax
-	; pop ax
-	; mov ax, y1
-	; add ax, dx
-	mov ax, 1
-	mul cx
-	mov bx, y1
-	add ax, bx
+	mov dx, total
+	sub dx, cx
+	push ax
+	mov ax, dx
+	mov bx, 1
+	mul bx
+	mov dx, ax
+	pop ax
+	mov ax, y1
+	add ax, dx
 		
 	push ax
 
-	; mov dx, 100
-	; sub dx, cx
-	; push ax
-	; mov ax, dx
-	; mov bx, 1
-	; mul bx
-	; mov dx, ax
-	; pop ax
-	; mov ax, x1
-	; add ax, dx
-	mov ax, 0
-	mul cx
-	mov bx, x1
-	add ax, bx
+	mov dx, total
+	sub dx, cx
+	push ax
+	mov ax, dx
+	mov bx, 1
+	mul bx
+	mov dx, ax
+	pop ax
+	mov ax, x1
+	add ax, dx
 		
 	push ax
 	push color
 	
 	call drawPixel
 	
-	add cx, 1
-	cmp cx, 100
+	sub cx, 1
+	cmp cx, 150
 	jne loop_begin
 	
 	loopend:
