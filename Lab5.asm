@@ -18,7 +18,7 @@ drawPixel:
 	push	dx
 	push	es
 
-	; set ES as segment of graphics frame buffer
+	; set ES as segment of graphisi frame buffer
 	mov	ax, 0A000h
 	mov	es, ax
 
@@ -34,7 +34,7 @@ drawPixel:
 	; DX = color
 	mov	dx, color
 
-	; plot the pixel in the graphics frame buffer
+	; plot the pixel in the graphisi frame buffer
 	mov	BYTE PTR es:[bx], dl
 
 	pop	es
@@ -150,7 +150,7 @@ drawLine_d1:
 		push	color
 		call	drawPixel
 		add	bx, 1
-		sub	dx, 1
+		sub	dx, 1 ; This is the difference
 		loopw	dld1_loop
 	dld1_end:
 
@@ -192,7 +192,7 @@ drawLine_d2:
 		push	color
 		call	drawPixel
 		add	bx, 1
-		add	dx, 1
+		add	dx, 1 ; This is the difference
 		loopw	dld2_loop
 	dld2_end:
 

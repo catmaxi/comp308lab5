@@ -210,7 +210,7 @@ drawLine_d2:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
 	y1 EQU ss:[bp+8]
-	X2 EQU ss:[bp+10]
+	x2 EQU ss:[bp+10]
 	y2 EQU ss:[bp+12]
 
 	push bp
@@ -219,32 +219,55 @@ drawLine_d2:
 	push    bx
 	push    cx
 
-
-	check_deltaX:
 	; BX keeps track of the X coordinate
-	; mov	bx, x1
-	mov dx, x2
-
-	; delta x
-	sub dx, x1
-
-	; if 0
-	jz check_deltaY
-
-	push dx
-
-	check_deltaY:
-
+	mov	bx, x1
+	
+	; deltaX
+	mov ax, x2
+	; mov dx, x1
+	sub ax, x1
+	
+	; deltaY
 	mov bx, y2
 	sub bx, y1
+	
 
+	max_int:
+	cmp ax, bx
+	jae if_x_ge_y
 
-	push bx
+	;else
+	mov cx, bx
+	jmp finish_max_int
 
+	if_x_ge_y:
+	mov cx, ax
+	; jmp finish_max_int
 
+	finish_max_int:
+	
+		; if both are equal then we can run the loop
+	cmp ax, bx
+	je preloop
+	
+	; if at least one of them is zero then we can just run the loop
+	mov dx, ax
+	and dx, bx
+	not dx
+	
+	cmp dx, 1
+	je preloop
+	
+	;else
+	; then we have to set both of them equal to the max
+	mov ax, cx
+	mov bx, cx
+	
+	preloop:
 
 
 	; CX = number of pixels to draw
+	mov bx, x1
 	mov	cx, x2
 	sub	cx, bx
 	inc	cx
@@ -263,7 +286,7 @@ drawLine_d2:
 	pop bp
 
 	ret 10
-
+	
 
 start:
 	; initialize data segment
@@ -278,10 +301,11 @@ start:
 	; draw a house
 
 	; left wall
+	push WORD PTR 110
 	push WORD PTR 260
 	push WORD PTR 110
 	push WORD PTR 60
-	push WORD PTR 60
+	
 	push 0001h
 	call drawLine
 
