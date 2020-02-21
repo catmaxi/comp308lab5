@@ -4,66 +4,29 @@
 .data
 .code
 
-drawLine:
-    color EQU ss:[bp+4]
-    x1 EQU ss:[bp+6]
-    y1 EQU ss:[bp+8]
-    x2 EQU ss:[bp+10]
-    y2 EQU ss:[bp+12]
-
-    mov ax, y1
-    mov bx, y2
-    cmp ax, bx
-    jz drawLine_h
-
-    mov ax, x1
-    mov bx, x2
-    cmp ax, bx
-    jz drawLine_v
-
-	jmp drawLine_d1
-
-; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
-drawPixel:
-	color EQU ss:[bp+4]
-	x1 EQU ss:[bp+6]
-	y1 EQU ss:[bp+8]
-
-	push	bp
-	mov	bp, sp
-
-	push	bx
-	push	cx
-	push	dx
-	push	es
-
-	; set ES as segment of graphics frame buffer
-	mov	ax, 0A000h
-	mov	es, ax
-
-
-	; BX = ( y1 * 320 ) + x1
-	mov	bx, x1
-	mov	cx, 320
-	xor	dx, dx
-	mov	ax, y1
-	mul	cx
-	add	bx, ax
-
-	; DX = color
-	mov	dx, color
-
-	; plot the pixel in the graphics frame buffer
-	mov	BYTE PTR es:[bx], dl
-
-	pop	es
-	pop	dx
-	pop	cx
-	pop	bx
-
-	pop	bp
-
-	ret	6
+; check if we have a special case of a horizontal or vertical line
+mov     bx, dx
+mov     ax, di
+sub     bx, cx	                ; BX = X2 -X1
+jzshort .dlf_vertloop
+sub     ax, si                  ; AX = Y2 -Y1
+jzshort .dlf_horzloop
+finit                           ; initialize FPU
+; make sure we are drawing along the right axis, so that our slope is <= 1
+cmp	 	ax, bx 
+ja      short .dlf_yorient		; (Y2 -Y1) > (X2 -X1) ? If so, change axis of drawing
+fild 	WORD PTR [bp+12]           ; ST(0) = Y1(floating point value on FPU stack)
+fld 	st(0)                   ; ST(1) = ST(0) = Y1
+fisubr	WORD PTR[bp+8]          ; ST(0) = Y2 -Y1
+fild	WORD PTR[bp+10]         ; ST(0) = X2
+fisub   WORD PTR[bp+14]         ; ST(0) = X2 -X1    
+fdiv
+; ST(0) = (X2 -X1)/(Y2 -Y1)(slope), ST(1) = Y1
+add     cx, 1                   ; next X
+faddst(0), st(1)            	; calculate next Y (prevY + slope)
+fist    WORD PTR[bp-14]         ; overwrite stack argument Y
+mov     [bp-12], cx             ; overwrite stack argument X
+call    draw_pixel
 	
 
 ; draw a horizontal line
