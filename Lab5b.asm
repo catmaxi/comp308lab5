@@ -223,30 +223,35 @@ drawLine:
 
 	mov bx, x2
 	mov cx, x1
-	mov ax, x2
-	mov si, y1
-	sub bx, cx ; BX = X2 - X1
-	jz drawLine_v
-	sub ax, si ; AX = Y2 - Y1
-	jz drawLine_h
-	finit ; initialize FPU
-	; make sure we are drawing along the right axis, so that our slope is <= 1
-	cmp ax, bx
-	; ja short drawLine_d1 ; (Y2 - Y1) > (X2 - X1) ? If so, change axis of drawing
-	fild WORD PTR[bp+12] ; ST(0) = Y1(floating point value on FPU stack)
-	fld st(0) ; ST(1) = ST(0) = Y1
-	fisubr WORD PTR[bp+8] ; ST(0) = Y2 - Y1
-	fild WORD PTR[bp+10] ; ST(0) = X2
-	fisub WORD PTR[bp+14] ; ST(0) = X2 - X1
-	fdiv ; ST(0) = (X2 - X1)/(Y2 - Y1)(slope), ST(1) = Y1
+	mov ax, y2
+	mov dx, y1
+	; sub bx, cx ; BX = X2 - X1
+	push cx
+	push dx
+	push ax
+	mov cx, color
+	push cx
+	call drawLine_v
+	; sub ax, dx ; AX = Y2 - Y1
+	; jz drawLine_h
+	; finit ; initialize FPU
+	; ; make sure we are drawing along the right axis, so that our slope is <= 1
+	; cmp ax, bx
+	; ; ja short drawLine_d1 ; (Y2 - Y1) > (X2 - X1) ? If so, change axis of drawing
+	; fild WORD PTR[bp+12] ; ST(0) = Y1(floating point value on FPU stack)
+	; fld st(0) ; ST(1) = ST(0) = Y1
+	; fisubr WORD PTR[bp+8] ; ST(0) = Y2 - Y1
+	; fild WORD PTR[bp+10] ; ST(0) = X2
+	; fisub WORD PTR[bp+14] ; ST(0) = X2 - X1
+	; fdiv ; ST(0) = (X2 - X1)/(Y2 - Y1)(slope), ST(1) = Y1
 
-	add cx, 1 ; next X
-	fadd st(0), st(1) ; calculate next Y (prev Y + slope)
-	fist WORD PTR[bp-14] ; overwrite stack argument Y
-	mov [bp-12], cx ; overwrite stack argument X
-	call drawPixel
+	; add cx, 1 ; next X
+	; fadd st(0), st(1) ; calculate next Y (prev Y + slope)
+	; fist WORD PTR[bp-14] ; overwrite stack argument Y
+	; mov [bp-12], cx ; overwrite stack argument X
+	; call drawPixel
 
-	ret 8
+	ret 10
 
 
 
@@ -264,18 +269,26 @@ start:
 
 	; left wall
 	push WORD PTR 190
-	push WORD PTR 110
 	push WORD PTR 60
 	push WORD PTR 110
+	push WORD PTR 60
 	push 0001h
-	call drawLine_v
+	call drawLine
 
-	; ; right wall
+
 	; push WORD PTR 190
 	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
+	; push WORD PTR 60
+	; push 0001h
 	; call drawLine_v
+
+	; ; right wall
+	push WORD PTR 190
+	push WORD PTR 260
+	push WORD PTR 110
+	push WORD PTR 260
+	push 0001h
+	call drawLine
 
 	; ; top
 	; push WORD PTR 260
