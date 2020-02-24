@@ -11,13 +11,115 @@ y2 EQU ss:[bp+6]
 x2 EQU ss:[bp+8]
 y1 EQU ss:[bp+10]
 x1 EQU ss:[bp+12]
+<<<<<<< HEAD
+
 push bp
 mov bp, sp
+
+deltaX equ ss:[bp - 2]
+deltaY equ ss:[bp - 4]
+slope equ ss:[bp - 6]
+y0 equ ss: [bp-8]
+y equ ss: [bp-10]
+x equ ss: [bp-12]
+sub sp, 12
+
+
+=======
+push bp
+mov bp, sp
+>>>>>>> 101d71e420358d64ba714998233330266210f892
 mov bx, x2
 mov ax, y2
 mov cx, x1
-mov si, y1
+mov dx, y1
 sub bx, cx	                ; BX = X2 -X1
+<<<<<<< HEAD
+mov deltaX, bx
+jz callh
+sub ax, dx                  ; AX = Y2 -Y1
+mov deltaY, ax
+jz callv
+
+xchg ax, bx
+
+div bx						; BX contains the slope
+mov slope, bx
+mov dx, bx					; Move slope to DX for loop
+
+mov ax, slope
+mov bx, x1
+mul bx
+mov ax, y1
+sub ax, bx					; b = mx1 - y1
+mov y0, ax					; y0 contains y-intercept
+
+mov bx, x1
+mov cx, y1
+mov x, bx
+mov y, cx
+
+outer:
+mov ax, x2
+mov bx, x
+cmp ax, bx
+jz exit
+inner:
+mov ax, y
+mov bx, y2
+cmp ax, bx
+jz finishith
+mov ax, slope
+mul bx						; Multiply x by slope
+mov dx, y0
+sub dx, bx					; DX contains y(x)
+cmp cx, dx					; Check if y = y(x)	
+jz callpix
+finishith:
+mov cx, y
+inc cx
+mov y, cx
+mov ax, y2
+cmp cx, ax
+jnz inner
+mov ax, x
+inc ax
+mov x, ax
+jmp outer
+
+callv:
+mov ax, y2
+mov bx, y1
+mov cx, x1
+mov dx, color
+push ax
+push bx
+push cx
+push dx
+call drawLine_v
+mov sp, bp
+pop bp
+ret 10
+
+callh:
+mov ax, x2
+mov bx, y1
+mov cx, x1
+mov dx, color
+push ax
+push bx
+push cx
+push dx
+call  drawLine_h
+mov sp, bp
+pop bp
+ret 10
+
+callpix:
+push cx
+push bx
+push color
+=======
 jz  drawLine_h
 sub ax, si                  ; AX = Y2 -Y1
 jz drawLine_v
@@ -37,7 +139,14 @@ fadd st(0), st(1)            	; calculate next Y (prevY + slope)
 fist WORD PTR[bp-14]         ; overwrite stack argument Y
 mov [bp-12], cx
 pop bp             ; overwrite stack argument X
+>>>>>>> 101d71e420358d64ba714998233330266210f892
 call drawPixel
+jmp finishith
+
+exit:
+mov sp, bp
+pop bp
+ret 10
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
 drawPixel:
@@ -155,91 +264,6 @@ drawLine_v:
 
 	ret 8
 
-
-; draw a right increasing diagonal line
-drawLine_d1:
-	color EQU ss:[bp+4]
-	x1 EQU ss:[bp+6]
-	y1 EQU ss:[bp+8]
-	x2 EQU ss:[bp+10]
-
-	push bp
-	mov bp, sp
-
-	push    bx
-	push    cx
-	push	dx
-
-	; BX keeps track of the X coordinate,
-	; DX keeps track of the Y coordinate
-	mov	bx, x1
-	mov	dx, y1
-
-	; CX = number of pixels to draw
-	mov	cx, x2
-	sub	cx, bx
-	inc	cx
-	dld1_loop:
-		push	dx
-		push	bx
-		push	color
-		call	drawPixel
-		add	bx, 1
-		sub	dx, 1
-		loopw	dld1_loop
-	dld1_end:
-
-	pop	dx
-	pop     cx
-	pop     bx
-
-	pop bp
-
-	ret 8
-
-
-; draw a right decreasing diagonal line
-drawLine_d2:
-	color EQU ss:[bp+4]
-	x1 EQU ss:[bp+6]
-	y1 EQU ss:[bp+8]
-	x2 EQU ss:[bp+10]
-
-	push bp
-	mov bp, sp
-
-	push    bx
-	push    cx
-	push	dx
-
-	; BX keeps track of the X coordinate,
-	; DX keeps track of the Y coordinate
-	mov	bx, x1
-	mov	dx, y1
-
-	; CX = number of pixels to draw
-	mov	cx, x2
-	sub	cx, bx
-	inc	cx
-	dld2_loop:
-		push	dx
-		push	bx
-		push	color
-		call	drawPixel
-		add	bx, 1
-		add	dx, 1
-		loopw	dld2_loop
-	dld2_end:
-
-	pop	dx
-	pop     cx
-	pop     bx
-
-	pop bp
-
-	ret 8
-
-
 start:
 	; initialize data segment
 	mov ax, @data
@@ -255,6 +279,7 @@ start:
 	; left wall
 	push WORD PTR 190
 	push WORD PTR 110
+	push WORD PTR 60
 	push WORD PTR 60
 	push 0001h
 	call drawLine
@@ -277,6 +302,7 @@ start:
 	push WORD PTR 260
 	push WORD PTR 190
 	push WORD PTR 60
+	push WORD PTR 50
 	push 0004h
 	call drawLine
 			
@@ -284,6 +310,7 @@ start:
 	push WORD PTR 160
 	push WORD PTR 110
 	push WORD PTR 60
+	push WORD PTR 50
 	push 0005h
 	call drawLine
 
@@ -291,6 +318,7 @@ start:
 	push WORD PTR 260
 	push WORD PTR 10
 	push WORD PTR 160
+	push WORD PTR 20
 	push 0006h
 	call drawLine
 
