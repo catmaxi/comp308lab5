@@ -11,6 +11,8 @@ y2 EQU ss:[bp+6]
 x2 EQU ss:[bp+8]
 y1 EQU ss:[bp+10]
 x1 EQU ss:[bp+12]
+push bp
+mov bp, sp
 mov bx, x2
 mov ax, y2
 mov cx, x1
@@ -33,7 +35,8 @@ fdiv
 add cx, 1                   ; next X
 fadd st(0), st(1)            	; calculate next Y (prevY + slope)
 fist WORD PTR[bp-14]         ; overwrite stack argument Y
-mov [bp-12], cx             ; overwrite stack argument X
+mov [bp-12], cx
+pop bp             ; overwrite stack argument X
 call drawPixel
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
