@@ -11,7 +11,6 @@ y2 EQU ss:[bp+6]
 x2 EQU ss:[bp+8]
 y1 EQU ss:[bp+10]
 x1 EQU ss:[bp+12]
-<<<<<<< HEAD
 
 push bp
 mov bp, sp
@@ -25,16 +24,11 @@ x equ ss: [bp-12]
 sub sp, 12
 
 
-=======
-push bp
-mov bp, sp
->>>>>>> 101d71e420358d64ba714998233330266210f892
 mov bx, x2
 mov ax, y2
 mov cx, x1
 mov dx, y1
 sub bx, cx	                ; BX = X2 -X1
-<<<<<<< HEAD
 mov deltaX, bx
 jz callh
 sub ax, dx                  ; AX = Y2 -Y1
@@ -119,27 +113,6 @@ callpix:
 push cx
 push bx
 push color
-=======
-jz  drawLine_h
-sub ax, si                  ; AX = Y2 -Y1
-jz drawLine_v
-finit                           ; initialize FPU
-; make sure we are drawing along the right axis, so that our slope is <= 1
-cmp ax, bx 
-;ja short .dlf_yorient		; (Y2 -Y1) > (X2 -X1) ? If so, change axis of drawing
-fild WORD PTR [bp+12]           ; ST(0) = Y1(floating point value on FPU stack)
-fld st(0)                   ; ST(1) = ST(0) = Y1
-fisubr WORD PTR[bp+8]          ; ST(0) = Y2 -Y1
-fild WORD PTR[bp+10]         ; ST(0) = X2
-fisub WORD PTR[bp+14]         ; ST(0) = X2 -X1    
-fdiv
-; ST(0) = (X2 -X1)/(Y2 -Y1)(slope), ST(1) = Y1
-add cx, 1                   ; next X
-fadd st(0), st(1)            	; calculate next Y (prevY + slope)
-fist WORD PTR[bp-14]         ; overwrite stack argument Y
-mov [bp-12], cx
-pop bp             ; overwrite stack argument X
->>>>>>> 101d71e420358d64ba714998233330266210f892
 call drawPixel
 jmp finishith
 
