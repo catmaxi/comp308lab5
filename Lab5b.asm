@@ -5,99 +5,71 @@
 .data
 .code
 
-; check if we have a special case of a horizontal or vertical line
-drawLine:
-color EQU ss:[bp+4]
-x1 EQU ss:[bp+6]
-y1 EQU ss:[bp+8]
-x2 EQU ss:[bp+10]
-y2 EQU ss:[bp+12]
+absolute:
+	x EQU ss:[bp+4]
+	push bp
+	mov bp, sp
 
-push bp
-mov bp, sp
+	mov ax, x
+	mov bx, 0
+	sub ax, bx
+	jl negative
 
-deltaX equ ss:[bp - 2]
-deltaY equ ss:[bp - 4]
-slope equ ss:[bp - 6]
-y0 equ ss: [bp-8]
-y equ ss: [bp-10]
-x equ ss: [bp-12]
-sub sp, 12
+	positive:
+	mov ax, x
+	mov sp, bp
+	pop bp
+	ret 2
+	negative:
+	mov ax, x
+	neg ax
+	mov sp, bp
+	pop bp
+	ret 2
 
-;push bp
-;mov bp, sp
 
-mov bx, x2
-mov ax, y2
-mov cx, x1
-mov dx, y1
-sub bx, cx	                ; BX = X2 -X1
 
-mov deltaX, bx
-jz callv
-sub ax, dx                  ; AX = Y2 -Y1
-mov deltaY, ax
-jz callh
+;; finds the min value between 2 and returns it in ax
+min:
+	x EQU ss:[bp+4]
+	y EQU ss:[bp+6]
 
-xchg ax, bx
+	push bp
+	mov bp, sp
 
-div bx						; BX contains the slope
-mov slope, bx
-mov dx, bx					; Move slope to DX for loop
+	mov ax, x
+	mov bx, y
 
-mov ax, slope
-mov bx, x1
-mul bx
-mov ax, y1
-sub ax, bx					; b = mx1 - y1
-mov y0, ax					; y0 contains y-intercept
+	cmp ax, bx
+	jge min_isY
 
-mov bx, x1
-mov cx, y1
-mov x, bx
-mov y, cx
+	min_isX:
+	mov ax, x
+	mov sp, bp
+	pop bp
+	ret 4
 
-outer:
-mov ax, x2
-mov bx, x
-cmp ax, bx
-jz exit
-inner:
-mov ax, y
-mov bx, y2
-cmp ax, bx
-jz finishith
-mov ax, slope
-mul bx						; Multiply x by slope
-mov dx, y0
-sub dx, bx					; DX contains y(x)
-cmp cx, dx					; Check if y = y(x)	
-jz callpix
-finishith:
-mov cx, y
-inc cx
-mov y, cx
-mov ax, y2
-cmp cx, ax
-jnz inner
-mov ax, x
-inc ax
-mov x, ax
-jmp outer
+	min_isY:
+	mov ax, y
+	mov sp, bp
+	pop bp
+	ret 4
 
-callv:
-mov ax, y2
-mov bx, y1
-mov cx, x1
-mov dx, color
-push ax
-push bx
-push cx
-push dx
-call drawLine_v
-mov sp, bp
-pop bp
-ret 10
+
+
+; callv:
+; mov ax, y2
+; mov bx, y1
+; mov cx, x1
+; mov dx, color
+; push ax
+; push bx
+; push cx
+; push dx
+; call drawLine_v
+; mov sp, bp
+; pop bp
+; ret 10
 
 callh:
 mov ax, x2
@@ -113,17 +85,238 @@ mov sp, bp
 pop bp
 ret 10
 
-callpix:
-push cx
-push bx
-push color
-call drawPixel
-jmp finishith
+; myLoop:
+; mov bx, deltaX
 
-exit:
+; push bx
+; call absolute
+; mov absX, ax
+
+; mov bx, deltaY
+
+; push bx
+; call absolute
+; mov absY, ax
+
+; mov ax, absX
+; mov bx, absY
+; push ax
+; push bx
+; call min
+; mov minXY, ax
+
+; mov ax, absX
+; mov dx, 0
+; mov bx, minXY
+; idiv bx
+; mov upX, ax
+
+; mov ax, absY
+; mov dx, 0
+; mov bx, minXY
+; idiv bx
+; mov upY, ax
+
+; mov cx, minXY
+; mov ax, x1
+; mov bx, y1
+
+; mov x, ax
+; mov y, bx
+
+; loopstart:
+;    ;;;;
+;    push bx
+;    push ax
+;    push color
+;    call drawPixel
+
+; 	mov ax, x
+; 	mov bx, upX
+; 	add ax, bx
+; 	mov x, ax
+
+; 	mov ax, y
+; 	mov bx, upY
+; 	add ax, bx
+; 	mov y, ax
+
+; 	mov ax, x
+; 	mov bx, y
+
+;    dec cx          ;Note:  decrementing cx and jumping on result is
+;    jnz loopstart
+;    exit:
+; 	mov sp, bp
+; 	pop bp
+; 	ret 10
+
+
+; check if we have a special case of a horizontal or vertical line
+drawLine:
+color EQU ss:[bp+4]
+x1 EQU ss:[bp+6]
+y1 EQU ss:[bp+8]
+x2 EQU ss:[bp+10]
+y2 EQU ss:[bp+12]
+
+push bp
+mov bp, sp
+
+deltaX equ ss:[bp - 2]
+deltaY equ ss:[bp - 4]
+slope equ ss:[bp - 6]
+y0 equ ss:[bp-8]
+y equ ss:[bp-10]
+x equ ss:[bp-12]
+minXY equ ss:[bp-14]
+upX equ ss:[bp-16]
+upY equ ss:[bp-18]
+absX equ ss:[bp-20]
+absY equ ss:[bp-22]
+sub sp, 22
+
+;push bp
+;mov bp, sp
+
+mov bx, x2
+mov ax, y2
+mov cx, x1
+mov dx, y1
+sub bx, cx	                ; BX = X2 -X1
+
+mov deltaX, bx
+jnz no_callv
+callv:
+mov ax, y2
+mov bx, y1
+mov cx, x1
+mov dx, color
+push ax
+push bx
+push cx
+push dx
+call drawLine_v
 mov sp, bp
 pop bp
 ret 10
+no_callv:
+
+sub ax, dx
+; sub dx, ax                  ; AX = Y2 -Y1
+mov deltaY, ax
+jz callh
+
+jmp myLoop
+
+myLoop:
+mov bx, deltaX
+
+push bx
+call absolute
+mov absX, ax
+
+mov bx, deltaY
+
+push bx
+call absolute
+mov absY, ax
+
+mov ax, absX
+mov bx, absY
+push ax
+push bx
+call min
+mov minXY, ax
+
+mov dx, 0
+mov ax, deltaX
+cwd
+mov bx, minXY
+idiv bx
+mov upX, ax
+
+mov dx, 0
+mov ax, deltaY
+cwd
+mov bx, minXY
+idiv bx
+mov upY, ax
+
+mov cx, minXY
+mov ax, x1
+mov bx, y1
+
+mov x, ax
+mov y, bx
+
+loopstart:
+   ;;;;
+   push bx
+   push ax
+   push color
+   call drawPixel
+
+	mov ax, x
+	mov bx, upX
+	add ax, bx
+	mov x, ax
+
+	mov ax, y
+	mov bx, upY
+	; neg bx
+	add ax, bx
+	mov y, ax
+
+	mov ax, x
+	mov bx, y
+
+   dec cx          ;Note:  decrementing cx and jumping on result is
+   jnz loopstart
+   exit:
+	mov sp, bp
+	pop bp
+	ret 10
+
+; callv:
+; mov ax, y2
+; mov bx, y1
+; mov cx, x1
+; mov dx, color
+; push ax
+; push bx
+; push cx
+; push dx
+; call drawLine_v
+; mov sp, bp
+; pop bp
+; ret 10
+
+; callh:
+; mov ax, x2
+; mov bx, y1
+; mov cx, x1
+; mov dx, color
+; push ax
+; push bx
+; push cx
+; push dx
+; call  drawLine_h
+; mov sp, bp
+; pop bp
+; ret 10
+
+; callpix:
+; push cx
+; push bx
+; push color
+; call drawPixel
+; jmp finishith
+
+; exit:
+; mov sp, bp
+; pop bp
+; ret 10
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
 drawPixel:
@@ -149,7 +342,7 @@ drawPixel:
 	mov	cx, 320
 	xor	dx, dx
 	mov	ax, y1
-	mul	cx
+	imul	cx
 	add	bx, ax
 
 	; DX = color
@@ -260,7 +453,7 @@ start:
 	; push 0002h
 	; call drawLine_v
 
-	; ; ; left wall
+	; ; left wall
 	push WORD PTR 190
 	push WORD PTR 60
 	push WORD PTR 110
@@ -268,21 +461,7 @@ start:
 	push 0001h
 	call drawLine
 
-
-
-
-	; mov ah, 0
-	; int 16h
-
-	; ; switch back to text mode
-	; mov ax, 4f02h
-	; mov bx, 3
-	; int 10h
-
-	; mov ax, 4C00h
-	; int 21h
-
-	; right wall
+	; ; right wall
 	
 	push WORD PTR 190
 	push WORD PTR 260
@@ -307,21 +486,25 @@ start:
 	push 0004h
 	call drawLine
 			
-	; ; roof left
-	; push WORD PTR 160
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push WORD PTR 50
-	; push 0005h
-	; call drawLine
+	; ; ; ; roof left
+	push WORD PTR 10
+	push WORD PTR 160
+	push WORD PTR 110
+	push WORD PTR 60
+	push 0005h
+	call drawLine
 
 	; ; roof right
 	; push WORD PTR 260
 	; push WORD PTR 10
 	; push WORD PTR 160
 	; push WORD PTR 20
-	; push 0006h
-	; call drawLine
+	push WORD PTR 10
+	push WORD PTR 160
+	push WORD PTR 110
+	push WORD PTR 260
+	push 0006h
+	call drawLine
 
 	; prompt for a key
 	mov ah, 0
