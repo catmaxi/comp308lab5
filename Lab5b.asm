@@ -30,10 +30,10 @@ mov cx, x1
 mov dx, y1
 sub bx, cx	                ; BX = X2 -X1
 mov deltaX, bx
-jz callh
+jz callv
 sub ax, dx                  ; AX = Y2 -Y1
 mov deltaY, ax
-jz callv
+jz callh
 
 xchg ax, bx
 
