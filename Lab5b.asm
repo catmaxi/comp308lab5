@@ -56,21 +56,6 @@ min:
 	ret 4
 
 
-
-; callv:
-; mov ax, y2
-; mov bx, y1
-; mov cx, x1
-; mov dx, color
-; push ax
-; push bx
-; push cx
-; push dx
-; call drawLine_v
-; mov sp, bp
-; pop bp
-; ret 10
-
 callh:
 mov ax, x2
 mov bx, y1
@@ -84,73 +69,6 @@ call  drawLine_h
 mov sp, bp
 pop bp
 ret 10
-
-; myLoop:
-; mov bx, deltaX
-
-; push bx
-; call absolute
-; mov absX, ax
-
-; mov bx, deltaY
-
-; push bx
-; call absolute
-; mov absY, ax
-
-; mov ax, absX
-; mov bx, absY
-; push ax
-; push bx
-; call min
-; mov minXY, ax
-
-; mov ax, absX
-; mov dx, 0
-; mov bx, minXY
-; idiv bx
-; mov upX, ax
-
-; mov ax, absY
-; mov dx, 0
-; mov bx, minXY
-; idiv bx
-; mov upY, ax
-
-; mov cx, minXY
-; mov ax, x1
-; mov bx, y1
-
-; mov x, ax
-; mov y, bx
-
-; loopstart:
-;    ;;;;
-;    push bx
-;    push ax
-;    push color
-;    call drawPixel
-
-; 	mov ax, x
-; 	mov bx, upX
-; 	add ax, bx
-; 	mov x, ax
-
-; 	mov ax, y
-; 	mov bx, upY
-; 	add ax, bx
-; 	mov y, ax
-
-; 	mov ax, x
-; 	mov bx, y
-
-;    dec cx          ;Note:  decrementing cx and jumping on result is
-;    jnz loopstart
-;    exit:
-; 	mov sp, bp
-; 	pop bp
-; 	ret 10
-
 
 ; check if we have a special case of a horizontal or vertical line
 drawLine:
@@ -176,8 +94,6 @@ absX equ ss:[bp-20]
 absY equ ss:[bp-22]
 sub sp, 22
 
-;push bp
-;mov bp, sp
 
 mov bx, x2
 mov ax, y2
@@ -251,7 +167,7 @@ mov x, ax
 mov y, bx
 
 loopstart:
-   ;;;;
+
    push bx
    push ax
    push color
@@ -264,59 +180,21 @@ loopstart:
 
 	mov ax, y
 	mov bx, upY
-	; neg bx
+
 	add ax, bx
 	mov y, ax
 
 	mov ax, x
 	mov bx, y
 
-   dec cx          ;Note:  decrementing cx and jumping on result is
+   dec cx          
    jnz loopstart
    exit:
 	mov sp, bp
 	pop bp
 	ret 10
 
-; callv:
-; mov ax, y2
-; mov bx, y1
-; mov cx, x1
-; mov dx, color
-; push ax
-; push bx
-; push cx
-; push dx
-; call drawLine_v
-; mov sp, bp
-; pop bp
-; ret 10
 
-; callh:
-; mov ax, x2
-; mov bx, y1
-; mov cx, x1
-; mov dx, color
-; push ax
-; push bx
-; push cx
-; push dx
-; call  drawLine_h
-; mov sp, bp
-; pop bp
-; ret 10
-
-; callpix:
-; push cx
-; push bx
-; push color
-; call drawPixel
-; jmp finishith
-
-; exit:
-; mov sp, bp
-; pop bp
-; ret 10
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
 drawPixel:
@@ -444,14 +322,6 @@ start:
 	int 10h
 
 	; draw a house
-
-	; ; right wall
-	
-	; push WORD PTR 190
-	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
-	; call drawLine_v
 
 	; ; left wall
 	push WORD PTR 190
