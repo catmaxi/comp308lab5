@@ -495,14 +495,10 @@ start:
 	call drawLine
 
 	; ; roof right
-	; push WORD PTR 260
-	; push WORD PTR 10
-	; push WORD PTR 160
-	; push WORD PTR 20
-	push WORD PTR 10
-	push WORD PTR 160
 	push WORD PTR 110
 	push WORD PTR 260
+	push WORD PTR 10
+	push WORD PTR 160
 	push 0006h
 	call drawLine
 
