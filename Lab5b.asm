@@ -284,27 +284,28 @@ start:
 
 	; right wall
 	
-	; push WORD PTR 190
-	; push WORD PTR 260
-	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
-	; call drawLine
+	push WORD PTR 190
+	push WORD PTR 260
+	push WORD PTR 110
+	push WORD PTR 260
+	push 0002h
+	call drawLine
 
 	; ; top
-	; push WORD PTR 260
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push 0003h
-	; call drawLine
+	push WORD PTR 110
+	push WORD PTR 260
+	push WORD PTR 110
+	push WORD PTR 60
+	push 0003h
+	call drawLine
 
 	; ; floor
-	; push WORD PTR 260
-	; push WORD PTR 190
-	; push WORD PTR 60
-	; push WORD PTR 50
-	; push 0004h
-	; call drawLine
+	push WORD PTR 190
+	push WORD PTR 260
+	push WORD PTR 190
+	push WORD PTR 60
+	push 0004h
+	call drawLine
 			
 	; ; roof left
 	; push WORD PTR 160
