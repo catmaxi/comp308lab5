@@ -1,4 +1,4 @@
-
+ 
 .286 
 .model small
 .stack 100h
@@ -8,10 +8,11 @@
 ; check if we have a special case of a horizontal or vertical line
 drawLine:
 color EQU ss:[bp+4]
-x1 EQU ss:[bp+6]
-y1 EQU ss:[bp+8]
-x2 EQU ss:[bp+10]
-y2 EQU ss:[bp+12]
+y2 EQU ss:[bp+6]
+x2 EQU ss:[bp+8]
+y1 EQU ss:[bp+10]
+x1 EQU ss:[bp+12]
+
 
 push bp
 mov bp, sp
@@ -24,8 +25,11 @@ y equ ss: [bp-10]
 x equ ss: [bp-12]
 sub sp, 12
 
-;push bp
-;mov bp, sp
+
+;;;;;;;
+push bp
+mov bp, sp
+;;;;;;;;;;
 
 mov bx, x2
 mov ax, y2
@@ -34,10 +38,10 @@ mov dx, y1
 sub bx, cx	                ; BX = X2 -X1
 
 mov deltaX, bx
-jz callv
+jz callh
 sub ax, dx                  ; AX = Y2 -Y1
 mov deltaY, ax
-jz callh
+jz callv
 
 xchg ax, bx
 
@@ -117,6 +121,7 @@ callpix:
 push cx
 push bx
 push color
+
 call drawPixel
 jmp finishith
 
@@ -204,12 +209,13 @@ drawLine_h:
 
 	ret 8
 
+
 ; draw a vertical line
 drawLine_v:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
 	y1 EQU ss:[bp+8]
-	y2 EQU ss:[bp+10]
+	y2 EQU ss:[bp+12]
 
 	push bp
 	mov bp, sp
@@ -252,75 +258,51 @@ start:
 
 	; draw a house
 
-	; ; right wall
-	
-	; push WORD PTR 190
-	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
-	; call drawLine_v
-
-	; ; ; left wall
+	; left wall
 	push WORD PTR 190
-	push WORD PTR 60
 	push WORD PTR 110
+	push WORD PTR 60
 	push WORD PTR 60
 	push 0001h
 	call drawLine
 
-
-
-
-	; mov ah, 0
-	; int 16h
-
-	; ; switch back to text mode
-	; mov ax, 4f02h
-	; mov bx, 3
-	; int 10h
-
-	; mov ax, 4C00h
-	; int 21h
-
 	; right wall
-	
-	; push WORD PTR 190
-	; push WORD PTR 260
-	; push WORD PTR 110
-	; push WORD PTR 260
-	; push 0002h
-	; call drawLine
+	push WORD PTR 190
+	push WORD PTR 110
+	push WORD PTR 260
+	push 0002h
+	call drawLine
 
-	; ; top
-	; push WORD PTR 260
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push 0003h
-	; call drawLine
+	; top
+	push WORD PTR 260
+	push WORD PTR 110
+	push WORD PTR 60
+	push 0003h
+	call drawLine
 
-	; ; floor
-	; push WORD PTR 260
-	; push WORD PTR 190
-	; push WORD PTR 60
-	; push WORD PTR 50
-	; push 0004h
-	; call drawLine
+	; floor
+	push WORD PTR 260
+	push WORD PTR 190
+	push WORD PTR 60
+	push WORD PTR 50
+	push 0004h
+	call drawLine
 			
-	; ; roof left
-	; push WORD PTR 160
-	; push WORD PTR 110
-	; push WORD PTR 60
-	; push WORD PTR 50
-	; push 0005h
-	; call drawLine
+	; roof left
+	push WORD PTR 160
+	push WORD PTR 110
+	push WORD PTR 60
+	push WORD PTR 50
+	push 0005h
+	call drawLine
 
-	; ; roof right
-	; push WORD PTR 260
-	; push WORD PTR 10
-	; push WORD PTR 160
-	; push WORD PTR 20
-	; push 0006h
-	; call drawLine
+	; roof right
+	push WORD PTR 260
+	push WORD PTR 10
+	push WORD PTR 160
+	push WORD PTR 20
+	push 0006h
+	call drawLine
 
 	; prompt for a key
 	mov ah, 0
@@ -335,3 +317,4 @@ start:
 	int 21h
 
 END start
+
