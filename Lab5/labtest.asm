@@ -1,82 +1,18 @@
-
+ 
 .286 
 .model small
 .stack 100h
 .data
 .code
 
-absolute:
-	x EQU ss:[bp+4]
-	push bp
-	mov bp, sp
-
-	mov ax, x
-	mov bx, 0
-	sub ax, bx
-	jl negative
-
-	positive:
-	mov ax, x
-	mov sp, bp
-	pop bp
-	ret 2
-	negative:
-	mov ax, x
-	neg ax
-	mov sp, bp
-	pop bp
-	ret 2
-
-
-
-;; finds the min value between 2 and returns it in ax
-min:
-	x EQU ss:[bp+4]
-	y EQU ss:[bp+6]
-
-	push bp
-	mov bp, sp
-
-	mov ax, x
-	mov bx, y
-
-	cmp ax, bx
-	jge min_isY
-
-	min_isX:
-	mov ax, x
-	mov sp, bp
-	pop bp
-	ret 4
-
-	min_isY:
-	mov ax, y
-	mov sp, bp
-	pop bp
-	ret 4
-
-
-callh:
-mov ax, x2
-mov bx, y1
-mov cx, x1
-mov dx, color
-push ax
-push bx
-push cx
-push dx
-call  drawLine_h
-mov sp, bp
-pop bp
-ret 10
-
 ; check if we have a special case of a horizontal or vertical line
 drawLine:
 color EQU ss:[bp+4]
-x1 EQU ss:[bp+6]
-y1 EQU ss:[bp+8]
-x2 EQU ss:[bp+10]
-y2 EQU ss:[bp+12]
+y2 EQU ss:[bp+6]
+x2 EQU ss:[bp+8]
+y1 EQU ss:[bp+10]
+x1 EQU ss:[bp+12]
+
 
 push bp
 mov bp, sp
@@ -84,16 +20,16 @@ mov bp, sp
 deltaX equ ss:[bp - 2]
 deltaY equ ss:[bp - 4]
 slope equ ss:[bp - 6]
+y0 equ ss: [bp-8]
+y equ ss: [bp-10]
+x equ ss: [bp-12]
+sub sp, 12
 
-y0 equ ss:[bp-8]
-y equ ss:[bp-10]
-x equ ss:[bp-12]
-minXY equ ss:[bp-14]
-upX equ ss:[bp-16]
-upY equ ss:[bp-18]
-absX equ ss:[bp-20]
-absY equ ss:[bp-22]
-sub sp, 22
+
+;;;;;;;
+push bp
+mov bp, sp
+;;;;;;;;;;
 
 mov bx, x2
 mov ax, y2
@@ -102,7 +38,56 @@ mov dx, y1
 sub bx, cx	                ; BX = X2 -X1
 
 mov deltaX, bx
-jnz no_callv
+jz callh
+sub ax, dx                  ; AX = Y2 -Y1
+mov deltaY, ax
+jz callv
+
+xchg ax, bx
+
+div bx						; BX contains the slope
+mov slope, bx
+mov dx, bx					; Move slope to DX for loop
+
+mov ax, slope
+mov bx, x1
+mul bx
+mov ax, y1
+sub ax, bx					; b = mx1 - y1
+mov y0, ax					; y0 contains y-intercept
+
+mov bx, x1
+mov cx, y1
+mov x, bx
+mov y, cx
+
+outer:
+mov ax, x2
+mov bx, x
+cmp ax, bx
+jz exit
+inner:
+mov ax, y
+mov bx, y2
+cmp ax, bx
+jz finishith
+mov ax, slope
+mul bx						; Multiply x by slope
+mov dx, y0
+sub dx, bx					; DX contains y(x)
+cmp cx, dx					; Check if y = y(x)	
+jz callpix
+finishith:
+mov cx, y
+inc cx
+mov y, cx
+mov ax, y2
+cmp cx, ax
+jnz inner
+mov ax, x
+inc ax
+mov x, ax
+jmp outer
 
 callv:
 mov ax, y2
@@ -118,85 +103,24 @@ mov sp, bp
 pop bp
 ret 10
 
-no_callv:
-
-sub ax, dx
-; sub dx, ax                  ; AX = Y2 -Y1
-mov deltaY, ax
-jz callh
-
-jmp myLoop
-
-myLoop:
-mov bx, deltaX
-
-push bx
-call absolute
-mov absX, ax
-
-mov bx, deltaY
-
-push bx
-call absolute
-mov absY, ax
-
-mov ax, absX
-mov bx, absY
+callh:
+mov ax, x2
+mov bx, y1
+mov cx, x1
+mov dx, color
 push ax
 push bx
-call min
-mov minXY, ax
+push cx
+push dx
+call  drawLine_h
+mov sp, bp
+pop bp
+ret 10
 
-mov dx, 0
-mov ax, deltaX
-cwd
-mov bx, minXY
-idiv bx
-mov upX, ax
-
-mov dx, 0
-mov ax, deltaY
-cwd
-mov bx, minXY
-idiv bx
-mov upY, ax
-
-mov cx, minXY
-mov ax, x1
-mov bx, y1
-
-mov x, ax
-mov y, bx
-
-loopstart:
-
-   push bx
-   push ax
-   push color
-   call drawPixel
-
-	mov ax, x
-	mov bx, upX
-	add ax, bx
-	mov x, ax
-
-	mov ax, y
-	mov bx, upY
-
-	add ax, bx
-	mov y, ax
-
-	mov ax, x
-	mov bx, y
-
-   dec cx          
-   jnz loopstart
-   exit:
-	mov sp, bp
-	pop bp
-	ret 10
-
-
+callpix:
+push cx
+push bx
+push color
 
 call drawPixel
 jmp finishith
@@ -230,7 +154,7 @@ drawPixel:
 	mov	cx, 320
 	xor	dx, dx
 	mov	ax, y1
-	imul	cx
+	mul	cx
 	add	bx, ax
 
 	; DX = color
@@ -285,13 +209,13 @@ drawLine_h:
 
 	ret 8
 
+
 ; draw a vertical line
 drawLine_v:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
 	y1 EQU ss:[bp+8]
-
-	y2 EQU ss:[bp+10]
+	y2 EQU ss:[bp+12]
 
 	push bp
 	mov bp, sp
@@ -334,56 +258,49 @@ start:
 
 	; draw a house
 
-
-	; ; left wall
+	; left wall
 	push WORD PTR 190
-	push WORD PTR 60
 	push WORD PTR 110
+	push WORD PTR 60
 	push WORD PTR 60
 	push 0001h
 	call drawLine
 
-	; ; right wall
-	
+	; right wall
 	push WORD PTR 190
-	push WORD PTR 260
-
 	push WORD PTR 110
 	push WORD PTR 260
 	push 0002h
 	call drawLine
 
-	; ; top
-	push WORD PTR 110
-
+	; top
 	push WORD PTR 260
 	push WORD PTR 110
 	push WORD PTR 60
 	push 0003h
 	call drawLine
 
-	; ; floor
-	push WORD PTR 190
+	; floor
 	push WORD PTR 260
 	push WORD PTR 190
 	push WORD PTR 60
+	push WORD PTR 50
 	push 0004h
 	call drawLine
 			
-	; ; ; ; roof left
-	push WORD PTR 10
+	; roof left
 	push WORD PTR 160
 	push WORD PTR 110
 	push WORD PTR 60
+	push WORD PTR 50
 	push 0005h
 	call drawLine
 
-	; ; roof right
-	push WORD PTR 110
+	; roof right
 	push WORD PTR 260
 	push WORD PTR 10
 	push WORD PTR 160
-
+	push WORD PTR 20
 	push 0006h
 	call drawLine
 
@@ -400,3 +317,4 @@ start:
 	int 21h
 
 END start
+
