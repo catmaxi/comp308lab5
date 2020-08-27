@@ -84,6 +84,7 @@ mov bp, sp
 deltaX equ ss:[bp - 2]
 deltaY equ ss:[bp - 4]
 slope equ ss:[bp - 6]
+
 y0 equ ss:[bp-8]
 y equ ss:[bp-10]
 x equ ss:[bp-12]
@@ -94,7 +95,6 @@ absX equ ss:[bp-20]
 absY equ ss:[bp-22]
 sub sp, 22
 
-
 mov bx, x2
 mov ax, y2
 mov cx, x1
@@ -103,6 +103,7 @@ sub bx, cx	                ; BX = X2 -X1
 
 mov deltaX, bx
 jnz no_callv
+
 callv:
 mov ax, y2
 mov bx, y1
@@ -116,6 +117,7 @@ call drawLine_v
 mov sp, bp
 pop bp
 ret 10
+
 no_callv:
 
 sub ax, dx
@@ -195,6 +197,14 @@ loopstart:
 	ret 10
 
 
+
+call drawPixel
+jmp finishith
+
+exit:
+mov sp, bp
+pop bp
+ret 10
 
 ; draw a single pixel specific to Mode 13h (320x200 with 1 byte per color)
 drawPixel:
@@ -280,6 +290,7 @@ drawLine_v:
 	color EQU ss:[bp+4]
 	x1 EQU ss:[bp+6]
 	y1 EQU ss:[bp+8]
+
 	y2 EQU ss:[bp+10]
 
 	push bp
@@ -323,6 +334,7 @@ start:
 
 	; draw a house
 
+
 	; ; left wall
 	push WORD PTR 190
 	push WORD PTR 60
@@ -335,6 +347,7 @@ start:
 	
 	push WORD PTR 190
 	push WORD PTR 260
+
 	push WORD PTR 110
 	push WORD PTR 260
 	push 0002h
@@ -342,6 +355,7 @@ start:
 
 	; ; top
 	push WORD PTR 110
+
 	push WORD PTR 260
 	push WORD PTR 110
 	push WORD PTR 60
@@ -369,6 +383,7 @@ start:
 	push WORD PTR 260
 	push WORD PTR 10
 	push WORD PTR 160
+
 	push 0006h
 	call drawLine
 
